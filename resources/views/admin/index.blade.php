@@ -29,7 +29,7 @@
                             </td>
                             <td class="align-middle text-center">
                                 @if($post->images->isNotEmpty())
-                                    <img src="{{ asset('storage/app/public/' . $post->images->first()->path) }}" alt="Post Image" style="width: 100px; height: auto;">
+                                    <img src="{{ asset('storage/' . $post->images->first()->path) }}" alt="Post Image" style="width: 100px; height: auto;">
                                 @else
                                     <p>No Image</p>
                                 @endif
