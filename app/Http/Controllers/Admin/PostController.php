@@ -23,27 +23,48 @@ class PostController extends Controller
         return view('admin.create', compact('categories'));
     }
 
-    public function store(StoreRequest $request)
+    public function edit(Post $post)
     {
-        // Validate the request data
-        $validatedData = $request->validated();
+        return view('admin.edit', compact('post'));
+    }
 
-        // Create the post
-        $post = Post::create($validatedData);
+    public function update(Request $request, Post $post, $id)
+    {
+        $post = Post::findOrFail($id);
 
-        // Handle the image upload
+        $request->validate([
+            'title' => 'required|max:255',
+            'content' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif', // Максимальный размер 2MB
+        ]);
+
+        // Обработка загрузки нового изображения
         if ($request->hasFile('image')) {
-            // Store the image
+            // Проверяем, есть ли изображение у поста
+            if ($post->images->isNotEmpty()) {
+                // Удаляем старое изображение из хранилища
+                Storage::disk('public')->delete($post->images->first()->path);
+
+                // Удаляем запись об изображении из базы данных
+                $post->images()->delete();
+            }
+
+            // Загрузка нового изображения в хранилище
             $path = $request->file('image')->store('images', 'public');
 
-            // Save the image path to the images table
-            Image::create([
+            // Создаем новую запись об изображении в базе данных
+            $post->images()->create([
                 'path' => $path,
-                'post_id' => $post->id,
             ]);
         }
 
-        // Redirect to the posts index
-        return redirect()->route('admin.posts.index');
+        // Обновление остальных данных поста
+        $post->update([
+            'title' => $request->input('title'),
+            'content' => $request->input('content'),
+        ]);
+
+        return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully');
     }
+
 }

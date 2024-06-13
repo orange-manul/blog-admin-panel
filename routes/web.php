@@ -19,8 +19,8 @@ Route::middleware(['auth', 'role:admin,moderator'])->prefix('admin')->group(func
     Route::get('/posts', [App\Http\Controllers\Admin\PostController::class, 'index'])->name('admin.posts.index');
     Route::get('/posts/create', [App\Http\Controllers\Admin\PostController::class, 'create'])->name('admin.posts.create');
     Route::post('/posts', [App\Http\Controllers\Admin\PostController::class, 'store'])->name('admin.posts.store');
-    Route::get('/posts/{id}/edit', [App\Http\Controllers\Admin\PostController::class, 'edit'])->name('admin.posts.edit');
-    Route::put('/posts/{id}', [App\Http\Controllers\Admin\PostController::class, 'update'])->name('admin.posts.update');
+    Route::get('/posts/edit/{post}', [App\Http\Controllers\Admin\PostController::class, 'edit'])->name('admin.posts.edit');
+    Route::put('/posts/update/{id}', [App\Http\Controllers\Admin\PostController::class, 'update'])->name('admin.posts.update');
     Route::delete('/posts/{id}', [App\Http\Controllers\Admin\PostController::class, 'destroy'])->name('admin.posts.destroy');
 });
 
