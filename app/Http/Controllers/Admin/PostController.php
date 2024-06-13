@@ -11,10 +11,15 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::with('images')->get();
-        return view('admin.index', compact('posts'));
+        // Определяем количество постов на странице (по умолчанию 10)
+        $perPage = $request->input('perPage', 10);
+
+        // Получаем посты с постраничной разбивкой и загрузкой связанных изображений
+        $posts = Post::with('images')->orderBy('created_at', 'desc')->paginate($perPage);
+
+        return view('admin.index', compact('posts', 'perPage'));
     }
 
     public function create()
