@@ -32,11 +32,14 @@
                         </div>
                         <p>{{ $post->content }}</p>
                         @if ($post->images->isNotEmpty())
-                            <img src="{{ asset('storage/' . $post->images->first()->path) }}" alt="Post Image" class="img-fluid" style="max-width: 300px; height: auto;">
+                            @foreach ($post->images as $image)
+                                <img src="{{ asset('storage/' . $image->path) }}" alt="Post Image" class="img-fluid" style="max-width: 300px; height: auto;">
+                            @endforeach
                         @endif
                     </div>
                     <hr>
                 @endforeach
+
 
                 <!-- Постраничная навигация -->
                 <div class="d-flex justify-content-center">

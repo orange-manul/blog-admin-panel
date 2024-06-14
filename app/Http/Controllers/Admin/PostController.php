@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRequest;
+use App\Http\Requests\Admin\UpdateRequest;
 use App\Models\Image;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -13,10 +14,10 @@ class PostController extends Controller
 {
     public function index(Request $request)
     {
-        // Определяем количество постов на странице (по умолчанию 10)
+        // Define the number of posts per page (10 by default)
         $perPage = $request->input('perPage', 10);
 
-        // Получаем посты с постраничной разбивкой и загрузкой связанных изображений
+        // Get posts with pagination and loading of linked images
         $posts = Post::with('images')->orderBy('created_at', 'desc')->paginate($perPage);
 
         return view('admin.index', compact('posts', 'perPage'));
@@ -33,40 +34,38 @@ class PostController extends Controller
         return view('admin.edit', compact('post'));
     }
 
-    public function update(Request $request, Post $post, $id)
+    public function update(UpdateRequest $request, $id)
     {
         $post = Post::findOrFail($id);
 
-        $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif', // Максимальный размер 2MB
-        ]);
+        // Validate the incoming request data based on the UpdateRequest rules
+        $validatedData = $request->validated();
 
-        // Обработка загрузки нового изображения
+        // Handling the upload of a new image if present
         if ($request->hasFile('image')) {
-            // Проверяем, есть ли изображение у поста
+
             if ($post->images->isNotEmpty()) {
-                // Удаляем старое изображение из хранилища
+
+                // Delete the old image from the storage
                 Storage::disk('public')->delete($post->images->first()->path);
 
-                // Удаляем запись об изображении из базы данных
+                // Delete the image record from the database
                 $post->images()->delete();
             }
 
-            // Загрузка нового изображения в хранилище
+            // Upload the new image to the storage
             $path = $request->file('image')->store('images', 'public');
 
-            // Создаем новую запись об изображении в базе данных
+            // Create a new record for the image in the database
             $post->images()->create([
                 'path' => $path,
             ]);
         }
 
-        // Обновление остальных данных поста
+        // Update the remaining post data
         $post->update([
-            'title' => $request->input('title'),
-            'content' => $request->input('content'),
+            'title' => $validatedData['title'],
+            'content' => $validatedData['content'],
         ]);
 
         return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully');
