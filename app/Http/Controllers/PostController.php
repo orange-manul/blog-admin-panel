@@ -7,10 +7,15 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::paginate(10);
-        return view('posts.index', compact('posts'));
+        // Define the number of posts per page (10 by default)
+        $perPage = $request->input('perPage', 10);
+
+        // Get posts with pagination and loading of linked images
+        $posts = Post::with('images')->orderBy('created_at', 'desc')->paginate($perPage);
+        $totalPosts = Post::count();
+        return view('posts.index', compact('posts', 'perPage', 'totalPosts'));
     }
 
     public function show($id)

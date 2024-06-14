@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->count(3)->moderator()->create();
 
-        Post::factory()->count(10)->create()->each(function ($post) {
+        Post::factory()->count(100)->create()->each(function ($post) {
             $images = Image::factory()->count(1)->create(['post_id' => $post->id]);
             $post->category()->associate(Category::factory()->create())->save();
 
