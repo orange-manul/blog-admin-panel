@@ -1,4 +1,4 @@
-@extends('layouts.post') {{-- Или другой ваш шаблон --}}
+@extends('layouts.post')
 
 @section('content')
     <div class="container mt-5">
