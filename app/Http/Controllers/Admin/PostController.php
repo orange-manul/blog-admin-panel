@@ -7,11 +7,18 @@ use App\Http\Requests\Admin\StoreRequest;
 use App\Http\Requests\Admin\UpdateRequest;
 use App\Models\Image;
 use App\Models\Post;
+use App\Service\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
+    protected PostService $postService;
+    public function __construct(PostService $postService)
+    {
+        $this->postService = $postService;
+    }
+
     public function index(Request $request)
     {
         // Define the number of posts per page (10 by default)
@@ -37,36 +44,10 @@ class PostController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         $post = Post::findOrFail($id);
-
         // Validate the incoming request data based on the UpdateRequest rules
         $validatedData = $request->validated();
 
-        // Handling the upload of a new image if present
-        if ($request->hasFile('image')) {
-
-            if ($post->images->isNotEmpty()) {
-
-                // Delete the old image from the storage
-                Storage::disk('public')->delete($post->images->first()->path);
-
-                // Delete the image record from the database
-                $post->images()->delete();
-            }
-
-            // Upload the new image to the storage
-            $path = $request->file('image')->store('images', 'public');
-
-            // Create a new record for the image in the database
-            $post->images()->create([
-                'path' => $path,
-            ]);
-        }
-
-        // Update the remaining post data
-        $post->update([
-            'title' => $validatedData['title'],
-            'content' => $validatedData['content'],
-        ]);
+        $this->postService->updatePost($request, $post, $validatedData);
 
         return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully');
     }
