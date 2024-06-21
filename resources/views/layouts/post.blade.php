@@ -59,8 +59,8 @@
 <!-- Core JS Files -->
 <script src="{{ asset('./assets/js/core/popper.min.js') }}"></script>
 <script src="{{ asset('./assets/js/core/bootstrap.min.js') }}"></script>
-<script src="{{ asset('./assets/js/plugins/perfect-scrollbar.min.js') }}"></script>
-<script src="{{ asset('./assets/js/plugins/smooth-scrollbar.min.js') }}"></script>
+{{--<script src="{{ asset('./assets/js/plugins/perfect-scrollbar.min.js') }}"></script>--}}
+{{--<script src="{{ asset('./assets/js/plugins/smooth-scrollbar.min.js') }}"></script>--}}
 <!-- Control Center for Material Dashboard -->
 <script src="{{ asset('./assets/js/material-dashboard.min.js?v=3.1.0') }}"></script>
 </body>
